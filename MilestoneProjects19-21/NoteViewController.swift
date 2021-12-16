@@ -7,11 +7,14 @@
 
 import UIKit
 
+// Добавлено соответсвие SendNotesDelegate чтобы передавать данные массива notes между контроллерами
 class NoteViewController: UITableViewController, SendNotesDelegate {
     
+    // Массив с заметками
     var notes = [Note]()
+    // Кнопка которая будет отображать количество заметок
     var notesCountInfo: UIBarButtonItem!
-    
+    // Переменная с обозревателем для количества заметок( можно попробовать убрать)
     var notesCount = 0 {
        didSet {
            notesCountInfo?.title = "\(notesCount) Notes"
@@ -19,29 +22,34 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
    }
     
     override func viewWillAppear(_ animated: Bool) {
+        // Перезагрузка таблицы при переходе между view controllers
         tableView.reloadData()
     }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        // Загрузка заметок при старте приложения
         loadData()
         
         title = "Notes"
         
+        // Установка цвета кнопок
         navigationController?.toolbar.tintColor = .systemOrange
-        
+        // Установка кнопок и пробелов между ними
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let newNoteButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(addNewNote))
         notesCountInfo = UIBarButtonItem(title: "\(notes.count) Notes", image: nil, primaryAction: nil, menu: nil)
         toolbarItems = [space,notesCountInfo, space, newNoteButton]
+        // Чтобы кнопки отображались на экране
         navigationController?.isToolbarHidden = false
 
       
     }
 
+    // Добавление заметки с переходом на detailViewController
     @objc func addNewNote() {
         if let vc = storyboard?.instantiateViewController(withIdentifier: "detail") as? DetailViewController {
-            vc.delegate = self
+            vc.delegate = self // должно быть установлено в каждом переходе для передачи notes
             vc.notes = notes
             vc.newNote = true
             navigationController?.pushViewController(vc, animated: true)
@@ -80,7 +88,7 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
             navigationController?.pushViewController(vc, animated: true)
         }
     }
-    
+    // Загрузка данных
     func loadData() {
         let defaults = UserDefaults.standard
         let jsonDecoder = JSONDecoder()
@@ -93,7 +101,7 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
             }
         }
     }
-    
+    // Сохранение данных
     func saveData() {
         let defaults = UserDefaults.standard
         let jsonEncoder = JSONEncoder()
@@ -102,7 +110,7 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
             defaults.setValue(savedData, forKey: "notes")
         }
     }
-    
+    // Соответстиве протоколу SendNotesDelegate
     func transferNotes(_ notes: [Note]) {
         self.notes = notes
     }

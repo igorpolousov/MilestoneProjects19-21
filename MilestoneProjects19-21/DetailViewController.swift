@@ -6,7 +6,7 @@
 //
 
 import UIKit
-
+// Протокол для передачи данных
 protocol SendNotesDelegate {
     func transferNotes(_ notes: [Note])
 }
@@ -21,7 +21,7 @@ class DetailViewController: UIViewController {
     
     var deletedNote =  false
     var originalText: String!
-    
+    // Для передачи данных delegate
     var delegate: SendNotesDelegate?
 
     override func viewDidLoad() {
@@ -30,22 +30,24 @@ class DetailViewController: UIViewController {
         originalText = noteText
         
         title = "Note"
+        // Установка цвета кнопок и текста
         navigationController?.toolbar.tintColor = .systemOrange
         navigationController?.navigationBar.tintColor = .systemOrange
-        
+        // Установка кнопок навигации
         navigationItem.rightBarButtonItems = [UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done)), UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareNote))]
-        
+        // Установка нижних кнопок
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
         let newNoteButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(addNote))
         toolbarItems = [trashButton, space, newNoteButton]
         navigationController?.isToolbarHidden = false
-        
+        // Подписка на уведомления notification center для метода adjustForKeyboard
         let notificationCenter = NotificationCenter.default
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification , object: nil)
         notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification , object: nil)
 
     }
+    // Сохранение заметки при нажитии кнопки назад
     override func viewWillDisappear(_ animated: Bool) {
         addingNotes()
         saveData()
@@ -53,7 +55,7 @@ class DetailViewController: UIViewController {
         textView.endEditing(true)
         dismiss(animated: true, completion: nil)
     }
-    
+    // Сохранение заметки при нажатии кнопки done
     @objc func done() {
         addingNotes()
         saveData()
@@ -105,7 +107,7 @@ class DetailViewController: UIViewController {
         noteIndex = nil
         textView.text = ""
     }
-    
+    // Функция проверки добавления новой заметки или редактирования старой
     func addingNotes() {
         if !deletedNote {
             if textView.text != "" && newNote {
@@ -124,10 +126,11 @@ class DetailViewController: UIViewController {
         }
     }
     
+    // Функция для указания кодгда нужно передавть данные в NoteViewController
     func updateDelegate() {
         delegate?.transferNotes(notes)
     }
-    
+    // Сохранение данных
     func saveData() {
         let defaults = UserDefaults.standard
         let jsonEncoder = JSONEncoder()
@@ -137,6 +140,7 @@ class DetailViewController: UIViewController {
         }
     }
     
+    // Настройки для клавиатуры
     @objc func adjustForKeyboard(notification: Notification) {
         
         guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
