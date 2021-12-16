@@ -22,9 +22,36 @@ class DetailViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        title = "Note"
+        navigationController?.toolbar.tintColor = .systemOrange
+        navigationController?.navigationBar.tintColor = .systemOrange
+        
+        navigationItem.rightBarButtonItems = [UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(done)), UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareNote))]
+        
+        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let trashButton = UIBarButtonItem(barButtonSystemItem: .trash, target: self, action: #selector(deleteNote))
+        let newNoteButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(addNote))
+        toolbarItems = [trashButton, space, newNoteButton]
+        navigationController?.isToolbarHidden = false
+        
 
-       
     }
     
+    @objc func done() {
+        
+    }
+    
+    @objc func shareNote() {
+        
+    }
+    
+    @objc func deleteNote() {
+        
+    }
+    
+    @objc func addNote() {
+        
+    }
 
 }

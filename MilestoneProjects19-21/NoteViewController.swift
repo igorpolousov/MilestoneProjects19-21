@@ -10,9 +10,14 @@ import UIKit
 class NoteViewController: UITableViewController, SendNotesDelegate {
     
     var notes = [Note]()
+    
+    override func viewWillAppear(_ animated: Bool) {
+        tableView.reloadData()
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        loadData()
         
         title = "Notes"
         
