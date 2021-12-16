@@ -13,10 +13,24 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        title = "Notes"
+        
+        navigationController?.toolbar.tintColor = .systemOrange
+        
+        let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
+        let newNoteButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(addNewNote))
+        let NotesCountInfo = UIBarButtonItem(title: "\(notes.count) Notes", image: nil, primaryAction: nil, menu: nil)
+        toolbarItems = [space,NotesCountInfo, space, newNoteButton]
+        navigationController?.isToolbarHidden = false
 
       
     }
 
+    @objc func addNewNote() {
+        
+    }
+    
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
