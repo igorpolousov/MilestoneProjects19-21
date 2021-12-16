@@ -8,7 +8,7 @@
 import UIKit
 
 protocol SendNotesDelegate {
-    func transferNotes(notes: [Note])
+    func transferNotes(_ notes: [Note])
 }
 
 class DetailViewController: UIViewController {
@@ -17,6 +17,7 @@ class DetailViewController: UIViewController {
     var newNote: Bool!
     var noteText: String!
     var noteIndex: Int!
+    @IBOutlet var textView: UITextView!
     
     var delegate: SendNotesDelegate?
 
@@ -35,7 +36,13 @@ class DetailViewController: UIViewController {
         toolbarItems = [trashButton, space, newNoteButton]
         navigationController?.isToolbarHidden = false
         
+        let notificationCenter = NotificationCenter.default
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillHideNotification , object: nil)
+        notificationCenter.addObserver(self, selector: #selector(adjustForKeyboard), name: UIResponder.keyboardWillChangeFrameNotification , object: nil)
 
+    }
+    override func viewWillDisappear(_ animated: Bool) {
+        updateDelegate()
     }
     
     @objc func done() {
@@ -51,6 +58,38 @@ class DetailViewController: UIViewController {
     }
     
     @objc func addNote() {
+        
+    }
+    
+    func updateDelegate() {
+        delegate?.transferNotes(notes)
+    }
+    
+    func saveData() {
+        let defaults = UserDefaults.standard
+        let jsonEncoder = JSONEncoder()
+        
+        if let savedData = try? jsonEncoder.encode(notes) {
+            defaults.setValue(savedData, forKey: "notes")
+        }
+    }
+    
+    @objc func adjustForKeyboard(notification: Notification) {
+        
+        guard let keyboardValue = notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue else { return }
+        
+        let keyboardScreenEndFrame = keyboardValue.cgRectValue
+        let keyboardViewEndFrame = view.convert(keyboardScreenEndFrame, from: view.window)
+        
+        if notification.name == UIResponder.keyboardWillHideNotification {
+            textView.contentInset = .zero
+        } else {
+            textView.contentInset = UIEdgeInsets(top: 0, left: 0, bottom: keyboardViewEndFrame.height - view.safeAreaInsets.bottom, right: 0)
+        }
+        
+        textView.scrollIndicatorInsets = textView.contentInset
+        let selectedRange = textView.selectedRange
+        textView.scrollRangeToVisible(selectedRange)
         
     }
 

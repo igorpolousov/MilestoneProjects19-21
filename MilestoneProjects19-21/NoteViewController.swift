@@ -95,7 +95,7 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
         }
     }
     
-    func transferNotes(notes: [Note]) {
+    func transferNotes(_ notes: [Note]) {
         self.notes = notes
     }
 
