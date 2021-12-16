@@ -13,6 +13,11 @@ protocol SendNotesDelegate {
 
 class DetailViewController: UIViewController {
     
+    var notes = [Note]()
+    var newNote: Bool!
+    var noteText: String!
+    var noteIndex: Int!
+    
     var delegate: SendNotesDelegate?
 
     override func viewDidLoad() {

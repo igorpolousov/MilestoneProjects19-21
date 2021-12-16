@@ -28,7 +28,12 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
     }
 
     @objc func addNewNote() {
-        
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "detail") as? DetailViewController {
+            vc.delegate = self
+            vc.notes = notes
+            vc.newNote = true
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     // MARK: - Table view data source
@@ -46,15 +51,43 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
     
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
-            tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            notes.remove(at: indexPath.row)
+            saveData()
+        }
+        tableView.deleteRows(at: [indexPath], with: .fade)
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        //
+        if let vc = storyboard?.instantiateViewController(withIdentifier: "detail") as? DetailViewController {
+            vc.noteText = notes[indexPath.row].noteTitle
+            vc.delegate = self
+            vc.newNote = false
+            vc.noteIndex = indexPath.row
+            vc.notes = notes
+            navigationController?.pushViewController(vc, animated: true)
+        }
+    }
+    
+    func loadData() {
+        let defaults = UserDefaults.standard
+        let jsonDecoder = JSONDecoder()
+        
+        if let savedData = defaults.object(forKey: "notes") as? Data {
+            do {
+                notes = try jsonDecoder.decode([Note].self, from: savedData)
+            } catch {
+                print("Unable to load data")
+            }
+        }
+    }
+    
+    func saveData() {
+        let defaults = UserDefaults.standard
+        let jsonEncoder = JSONEncoder()
+        
+        if let savedData = try? jsonEncoder.encode(notes) {
+            defaults.setValue(savedData, forKey: "notes")
+        }
     }
     
     func transferNotes(notes: [Note]) {
