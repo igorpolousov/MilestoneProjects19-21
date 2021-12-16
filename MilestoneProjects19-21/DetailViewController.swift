@@ -19,10 +19,15 @@ class DetailViewController: UIViewController {
     var noteIndex: Int!
     @IBOutlet var textView: UITextView!
     
+    var deletedNote =  false
+    var originalText: String!
+    
     var delegate: SendNotesDelegate?
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        textView.text = noteText
+        originalText = noteText
         
         title = "Note"
         navigationController?.toolbar.tintColor = .systemOrange
@@ -42,23 +47,81 @@ class DetailViewController: UIViewController {
 
     }
     override func viewWillDisappear(_ animated: Bool) {
+        addingNotes()
+        saveData()
         updateDelegate()
+        textView.endEditing(true)
+        dismiss(animated: true, completion: nil)
     }
     
     @objc func done() {
-        
+        addingNotes()
+        saveData()
+        updateDelegate()
+        textView.endEditing(true)
+        newNote = false
     }
     
+    // Нажатие кнопки поделиться заметкой
     @objc func shareNote() {
-        
+        if let index = noteIndex {
+            let ac = UIActivityViewController(activityItems: [notes[index].noteTitle], applicationActivities: [])
+            present(ac, animated: true)
+        }
     }
     
+    // Нажатие кнопки корзина
     @objc func deleteNote() {
-        
+        let ac = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        ac.addAction(UIAlertAction(title: "Delete", style: .destructive, handler: { [weak self] _ in
+            self?.forDeleteNote()
+        }))
+        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+        present(ac, animated: true)
     }
     
+    // Вспомогательная для deleteNote()
+    func forDeleteNote() {
+        deletedNote = true
+        if let index = noteIndex {
+            notes.remove(at: index)
+        }
+        if notes.count == 0 {
+            noteIndex = nil
+        }
+        noteIndex = nil
+        textView.text = ""
+        deletedNote = false
+        newNote = true
+        updateDelegate()
+        saveData()
+    }
+    
+    // Нажатие кнопки новая заметка
     @objc func addNote() {
-        
+        saveData()
+        newNote = true
+        updateDelegate()
+        noteIndex = nil
+        textView.text = ""
+    }
+    
+    func addingNotes() {
+        if !deletedNote {
+            if textView.text != "" && newNote {
+                let example = Note(noteTitle: textView.text, noteText: "")
+                notes.insert(example, at: 0)
+            }
+            
+            if textView.text != originalText {
+                if let text = textView.text {
+                    if let index = noteIndex {
+                        notes[index].noteTitle = text
+                        
+                    }
+                }
+            }
+        }
     }
     
     func updateDelegate() {

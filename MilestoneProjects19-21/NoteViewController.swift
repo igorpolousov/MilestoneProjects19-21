@@ -10,6 +10,13 @@ import UIKit
 class NoteViewController: UITableViewController, SendNotesDelegate {
     
     var notes = [Note]()
+    var notesCountInfo: UIBarButtonItem!
+    
+    var notesCount = 0 {
+       didSet {
+           notesCountInfo?.title = "\(notesCount) Notes"
+       }
+   }
     
     override func viewWillAppear(_ animated: Bool) {
         tableView.reloadData()
@@ -25,8 +32,8 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
         
         let space = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: self, action: nil)
         let newNoteButton = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(addNewNote))
-        let NotesCountInfo = UIBarButtonItem(title: "\(notes.count) Notes", image: nil, primaryAction: nil, menu: nil)
-        toolbarItems = [space,NotesCountInfo, space, newNoteButton]
+        notesCountInfo = UIBarButtonItem(title: "\(notes.count) Notes", image: nil, primaryAction: nil, menu: nil)
+        toolbarItems = [space,notesCountInfo, space, newNoteButton]
         navigationController?.isToolbarHidden = false
 
       
@@ -44,6 +51,7 @@ class NoteViewController: UITableViewController, SendNotesDelegate {
     // MARK: - Table view data source
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        notesCount = notes.count
         return notes.count
     }
 
